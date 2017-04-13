@@ -10,4 +10,4 @@ import mab_environment as mabe
 # results
 
 env = mabe.MultiArmedBanditEnvironment(k_arms=5, hyper_a=0.5, hyper_b=0.5)
-print env.reward_model
+print (env.reward_model)
