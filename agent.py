@@ -10,6 +10,7 @@ class Agent:
         self.rewards_earned = []
         self.transition_beliefs = None
         self.reward_beliefs = None
+        self.time_taken = None
 
     # Update the transition model
     def update_transitions(self, state, action, next_state):
@@ -29,3 +30,9 @@ class Agent:
     # Essentially this will wrap over a policy, which maps states -> actions, to include exploit/explore dynamic
     def determine_action(self, state, possible_actions):
         pass
+
+    def print_diagnostics(self):
+        print("Reward Beliefs %s" % self.reward_beliefs)
+
+    def to_string(self):
+        return "Base Agent"
