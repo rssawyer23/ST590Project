@@ -11,6 +11,7 @@ class Agent:
         self.transition_beliefs = None
         self.reward_beliefs = None
         self.time_taken = None
+        self.converged_iteration = -1
 
     # Update the transition model
     def update_transitions(self, state, action, next_state):

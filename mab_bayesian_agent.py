@@ -10,6 +10,8 @@ class MabBayesianAgent(a.Agent):
         a.Agent.__init__(self)
         self.reward_beliefs = dict()
         self.arms = k_arms
+        self.exploring = True
+        self.max_arm = None
         for k in range(k_arms):
             self.reward_beliefs[k] = [prior_a, prior_b]
 
@@ -22,16 +24,44 @@ class MabBayesianAgent(a.Agent):
     def determine_action(self, state, possible_actions):
         # Sample reward probabilities from reward_beliefs
         # Select max action (index) of sampled_reward_beliefs
-        sampled_probabilities = []
+        if self.exploring:
+            sampled_probabilities = []
+            for i in range(self.arms):
+                p_i = float(np.random.beta(self.reward_beliefs[i][0],self.reward_beliefs[i][1], size=1))
+                sampled_probabilities.append(p_i)
+            if len(self.rewards_earned) > 300 and len(self.rewards_earned) % 50 == 0:
+                opt_prob, opt_arm = self.optimal_belief()
+                if opt_prob > 0.95:
+                    self.exploring = False
+                    self.max_arm = opt_arm
+                    self.converged_iteration = len(self.rewards_earned)
+            return np.argmax(sampled_probabilities)
+        else:
+            return self.max_arm
+
+    # Function for calculating posterior probability that arm with highest expected reward is maximum reward arm
+    # This is done by sampling each arms posterior distribution and calculating the number of samples where max arm is max sample
+    def optimal_belief(self, sample_size=10000):
+        samples = []
+        max_arm_exp = 0
+        max_arm_ind = None
         for i in range(self.arms):
-            p_i = float(np.random.beta(self.reward_beliefs[i][0],self.reward_beliefs[i][1], size=1))
-            sampled_probabilities.append(p_i)
-        return np.argmax(sampled_probabilities)
+            arm_exp = self.reward_beliefs[i][0] / float(self.reward_beliefs[i][1] + self.reward_beliefs[i][0])
+            if arm_exp > max_arm_exp:
+                max_arm_exp = arm_exp
+                max_arm_ind = i
+            p_i = np.random.beta(self.reward_beliefs[i][0],self.reward_beliefs[i][1],size=sample_size)
+            samples.append(p_i)
+        samples = np.array(samples)
+        max_ind_array = np.apply_along_axis(np.argmax, arr=samples, axis=0)
+        return np.mean(max_ind_array == max_arm_ind), max_arm_ind
 
     def print_diagnostics(self):
         print("Bayesian Agent")
         print("\tAverage Reward: %.4f" % np.mean(self.rewards_earned))
         print("\tTime Taken: %.4f" % self.time_taken)
+        print("\tMax Arm Belief: %.4f, Arm %d" % self.optimal_belief())
+        print("\tConverged Iteration: %d" % self.converged_iteration)
         print("\tReward Beliefs")
         for arm in range(self.arms):
             arm_p = self.reward_beliefs[arm][0] / (self.reward_beliefs[arm][0] + self.reward_beliefs[arm][1])

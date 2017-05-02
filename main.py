@@ -30,18 +30,19 @@ def run_mab_agent(agent, env, time_steps=10):
 
 
 k_arms = 5
-time_steps = 10
+time_steps = 10000
 state = 1  # could use random selection here
 tot_reward = 0
 eps_decay = 20
 show = True
 
-env = mabe.MultiArmedBanditEnvironment(k_arms=k_arms, hyper_a=0.3, hyper_b=0.5)
-eps = epsag.EpsGreedyAgent(k_arms=k_arms, epsilon_decay=eps_decay)
+env = mabe.MultiArmedBanditEnvironment(k_arms=k_arms, hyper_a=0.2, hyper_b=0.7)
+eps = epsag.EpsGreedyAgent(k_arms=k_arms, epsilon_decay=eps_decay, decay=True)
+eps_no_decay = epsag.EpsGreedyAgent(k_arms=k_arms, epsilon_decay=0.05, decay=False)
 bay = mba.MabBayesianAgent(k_arms=k_arms, prior_a=0.5, prior_b=0.5)
 env.environment_diagnostics()
 
-agents = [eps, bay]
+agents = [eps, eps_no_decay, bay]
 for agent in agents:
     run_mab_agent(agent=agent, env=env, time_steps=time_steps)
     agent.print_diagnostics()
