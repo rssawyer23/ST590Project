@@ -24,6 +24,7 @@ class MabBayesianAgent(a.Agent):
     def determine_action(self, state, possible_actions):
         # Sample reward probabilities from reward_beliefs
         # Select max action (index) of sampled_reward_beliefs
+        action_taken = -1
         if self.exploring:
             sampled_probabilities = []
             for i in range(self.arms):
@@ -35,9 +36,11 @@ class MabBayesianAgent(a.Agent):
                     self.exploring = False
                     self.max_arm = opt_arm
                     self.converged_iteration = len(self.rewards_earned)
-            return np.argmax(sampled_probabilities)
+            action_taken = np.argmax(sampled_probabilities)
         else:
-            return self.max_arm
+            action_taken = self.max_arm
+        self.actions_taken.append(action_taken)
+        return action_taken
 
     # Function for calculating posterior probability that arm with highest expected reward is maximum reward arm
     # This is done by sampling each arms posterior distribution and calculating the number of samples where max arm is max sample
@@ -56,9 +59,10 @@ class MabBayesianAgent(a.Agent):
         max_ind_array = np.apply_along_axis(np.argmax, arr=samples, axis=0)
         return np.mean(max_ind_array == max_arm_ind), max_arm_ind
 
-    def print_diagnostics(self):
+    def print_diagnostics(self, best_action):
         print("Bayesian Agent")
-        print("\tAverage Reward: %.4f" % np.mean(self.rewards_earned))
+        print("\tAverage Reward: %.4f (%.4f)" % (np.mean(self.rewards_earned), np.std(self.rewards_earned)))
+        print("\tPercent Correct Arm: %.4f" % np.mean(np.array(self.actions_taken) == correct_arm))
         print("\tTime Taken: %.4f" % self.time_taken)
         print("\tMax Arm Belief: %.4f, Arm %d" % self.optimal_belief())
         print("\tConverged Iteration: %d" % self.converged_iteration)

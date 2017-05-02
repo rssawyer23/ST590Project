@@ -8,6 +8,7 @@ class Agent:
     '''
     def __init__(self):
         self.rewards_earned = []
+        self.actions_taken = []
         self.transition_beliefs = None
         self.reward_beliefs = None
         self.time_taken = None
@@ -32,7 +33,7 @@ class Agent:
     def determine_action(self, state, possible_actions):
         pass
 
-    def print_diagnostics(self):
+    def print_diagnostics(self, best_action):
         print("Reward Beliefs %s" % self.reward_beliefs)
 
     def to_string(self):

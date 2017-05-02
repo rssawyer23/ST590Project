@@ -29,6 +29,7 @@ class EpsGreedyAgent(a.Agent):
         # Sample reward probabilities from reward_beliefs
         # Select max action (index) of sampled_reward_beliefs
         epsilon = self.get_epsilon()
+        action_taken = -1
         if self.exploring:
             self.final_epsilon = epsilon
             if epsilon < 0.005:
@@ -37,12 +38,14 @@ class EpsGreedyAgent(a.Agent):
                 self.exploring = False
             if np.random.random() > epsilon:
                 # Greedy path, select best arm
-                return np.argmax(self.reward_beliefs)
+                action_taken = np.argmax(self.reward_beliefs)
             else:
                 # Exploration path, select random arm
-                return np.random.randint(self.arms)
+                action_taken = np.random.randint(self.arms)
         else:
-            return self.max_arm
+            action_taken = self.max_arm
+        self.actions_taken.append(action_taken)
+        return action_taken
 
     def get_epsilon(self):
         if self.should_decay:
@@ -51,9 +54,13 @@ class EpsGreedyAgent(a.Agent):
         else:
             return self.decay
 
-    def print_diagnostics(self):
-        print("Epsilon Greedy Agent Decay=%s" % self.should_decay)
-        print("\tAverage Reward: %.4f" % np.mean(self.rewards_earned))
+    def print_diagnostics(self, best_action):
+        if self.should_decay:
+            print("Epsilon Greedy Agent Decay=%d" % self.decay)
+        else:
+            print("Epsilon Greedy Agent Decay=%s" % self.should_decay)
+        print("\tAverage Reward: %.4f (%.4f)" % (np.mean(self.rewards_earned), np.std(self.rewards_earned)))
+        print("\tPercent Correct Arm: %.4f" % np.mean(np.array(self.actions_taken) == correct_arm))
         print("\tTime Taken %.4f" % self.time_taken)
         print("\tFinal Epsilon %.4f" % self.final_epsilon)
         print("\tConverged Iteration: %d" % self.converged_iteration)
@@ -62,4 +69,7 @@ class EpsGreedyAgent(a.Agent):
             print("\t\tArm %d: %.4f" % (arm+1, self.reward_beliefs[arm]))
 
     def to_string(self):
-        return "Epsilon Greedy Agent Decay=%s" % self.should_decay
+        if self.should_decay:
+            return "Epsilon Greedy Agent Decay=%d" % self.decay
+        else:
+            return "Epsilon Greedy Agent Decay=%s" % self.should_decay

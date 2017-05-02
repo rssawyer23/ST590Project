@@ -21,7 +21,7 @@ def run_mab_agent(agent, env, time_steps=10):
     print("Starting agent %s at %s" % (agent.to_string(), start_time))
     for t in range(time_steps):
         action = agent.determine_action(possible_actions=None, state=None)
-        next_state = env.determine_next_state(state=1,action=action)
+        next_state = env.determine_next_state(state=1, action=action)
         reward = env.get_reward(action=action, state=1, next_state=next_state)
         agent.update(state=1, action=action, next_state=next_state, reward=reward)
     finish_time = datetime.datetime.now()
@@ -29,23 +29,25 @@ def run_mab_agent(agent, env, time_steps=10):
     agent.time_taken = time_taken
 
 
-k_arms = 5
-time_steps = 10000
+k_arms = 10
+time_steps = 1000
 state = 1  # could use random selection here
 tot_reward = 0
-eps_decay = 20
 show = True
 
 env = mabe.MultiArmedBanditEnvironment(k_arms=k_arms, hyper_a=0.2, hyper_b=0.7)
-eps = epsag.EpsGreedyAgent(k_arms=k_arms, epsilon_decay=eps_decay, decay=True)
+best_arm = np.argmax(env.reward_model)
+eps_10 = epsag.EpsGreedyAgent(k_arms=k_arms, epsilon_decay=10, decay=True)
+eps_20 = epsag.EpsGreedyAgent(k_arms=k_arms, epsilon_decay=20, decay=True)
+eps_50 = epsag.EpsGreedyAgent(k_arms=k_arms, epsilon_decay=50, decay=True)
 eps_no_decay = epsag.EpsGreedyAgent(k_arms=k_arms, epsilon_decay=0.05, decay=False)
 bay = mba.MabBayesianAgent(k_arms=k_arms, prior_a=0.5, prior_b=0.5)
 env.environment_diagnostics()
 
-agents = [eps, eps_no_decay, bay]
+agents = [eps_10, eps_20, eps_50, eps_no_decay, bay]
 for agent in agents:
     run_mab_agent(agent=agent, env=env, time_steps=time_steps)
-    agent.print_diagnostics()
+    agent.print_diagnostics(best_arm)
     if show:
         plt.plot(np.cumsum(agent.rewards_earned), label=agent.to_string())
 
