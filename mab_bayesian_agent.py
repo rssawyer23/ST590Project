@@ -62,7 +62,7 @@ class MabBayesianAgent(a.Agent):
     def print_diagnostics(self, best_action):
         print("Bayesian Agent")
         print("\tAverage Reward: %.4f (%.4f)" % (np.mean(self.rewards_earned), np.std(self.rewards_earned)))
-        print("\tPercent Correct Arm: %.4f" % np.mean(np.array(self.actions_taken) == correct_arm))
+        print("\tPercent Correct Arm: %.4f" % np.mean(np.array(self.actions_taken) == best_action))
         print("\tTime Taken: %.4f" % self.time_taken)
         print("\tMax Arm Belief: %.4f, Arm %d" % self.optimal_belief())
         print("\tConverged Iteration: %d" % self.converged_iteration)

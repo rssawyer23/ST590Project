@@ -60,7 +60,7 @@ class EpsGreedyAgent(a.Agent):
         else:
             print("Epsilon Greedy Agent Decay=%s" % self.should_decay)
         print("\tAverage Reward: %.4f (%.4f)" % (np.mean(self.rewards_earned), np.std(self.rewards_earned)))
-        print("\tPercent Correct Arm: %.4f" % np.mean(np.array(self.actions_taken) == correct_arm))
+        print("\tPercent Correct Arm: %.4f" % np.mean(np.array(self.actions_taken) == best_action))
         print("\tTime Taken %.4f" % self.time_taken)
         print("\tFinal Epsilon %.4f" % self.final_epsilon)
         print("\tConverged Iteration: %d" % self.converged_iteration)
