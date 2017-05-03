@@ -4,8 +4,8 @@ import numpy as np
 
 class EpsGreedyAgent(a.Agent):
     # Each arm (action) has a reward belief that is its probability of giving reward 1
-    def __init__(self, k_arms, epsilon_decay = 50, decay=True):
-        a.Agent.__init__(self)
+    def __init__(self, env, k_arms, epsilon_decay = 50, decay=True):
+        a.Agent.__init__(self, env)
         self.arms = k_arms
         self.counts = [0] * k_arms
         self.reward_beliefs = [0.5] * k_arms # Giving more reasonable start assumptions

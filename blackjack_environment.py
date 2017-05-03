@@ -11,13 +11,26 @@ class BlackjackEnvironment(e.Environment):
         # Dealer Value - value of the card the dealer is showing
 
     def generate_all_states(self):
-        pass
+        player_card_values = range(2,32)
+        usable_ace = [True, False]
+        dealer_value = range(2,12)
+        terminal = [False, True]
+        possible_state_tuples = []
+        for pcv in player_card_values:
+            for ua in usable_ace:
+                for dv in dealer_value:
+                    for term in terminal:
+                        possible_state_tuples.append((pcv, ua, dv, term))
+        return possible_state_tuples
+
+    def possible_actions(self, state):
+        return [0, 1]
 
     def initial_state(self):
-        state = [0,False,0]
+        state = [0, False, 0, False]
         card_one = self.draw_card()
         card_two = self.draw_card()
-        if card_one == 1 and card_two == 1: # Pair of aces drawn, using one ace as 1, one ace as a usable 11
+        if card_one == 1 and card_two == 1:  # Pair of aces drawn, using one ace as 1, one ace as a usable 11
             state[0] = 12
             state[1] = True
         elif card_one == 1 or card_two == 1:  # One ace drawn, is a usable 11 (already at 1 so adding 10 to make 11)
@@ -37,12 +50,12 @@ class BlackjackEnvironment(e.Environment):
         card = np.random.randint(1, 14, 1)
         if card > 10:
             card = 10
-        return card
+        return int(card)
 
     def stay_vs_dealer(self, state):  # Agent performed "stay" or reached 21, dealer will play to 17+
         dealer_value = state[2]
         usable_ace = dealer_value == 11
-        while dealer_value < 17 and not usable_ace:
+        while dealer_value < 17 and not usable_ace and state[0] > dealer_value:
             dealer_card = self.draw_card()
             if dealer_card == 1 and not usable_ace:
                 dealer_card = 11
@@ -60,6 +73,7 @@ class BlackjackEnvironment(e.Environment):
     def determine_next_state(self, state, action):
         next_state = state.copy()
         if action == 0:
+            next_state[3] = True
             return next_state
         else:
             card_value = self.draw_card()
@@ -72,13 +86,15 @@ class BlackjackEnvironment(e.Environment):
             if next_state[0] > 21 and next_state[1]:  # Bust, so converting usable ace from eleven to one (subtract 10)
                 next_state[1] = False
                 next_state[0] -= 10
+            if next_state[0] > 21:
+                next_state[3] = True
         return next_state
 
     def get_reward(self, state, action, next_state): # will return reward and boolean determining if continue allowed
         if next_state[0] > 21:
-            return -1, False
-        elif action == 0 or next_state[0] == 21:  # Blackjack Agent stays or is forced to stay by reaching 21
-            return self.stay_vs_dealer(next_state), False  # Evaluate dealer hand, give reward, end round
+            return -1
+        elif next_state[3]:  # Blackjack Agent stays or is forced to stay by reaching 21
+            return self.stay_vs_dealer(next_state)  # Evaluate dealer hand, give reward, end round
         else:
-            return 0, True  # Agent has not busted and did not stay on last hand
+            return 0  # Agent has not busted and did not stay on last hand
 

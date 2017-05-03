@@ -6,21 +6,38 @@ class Agent:
         Transition Beliefs - probability the agent believes of next state given state and action
         Reward Beliefs - reward the agent believes of state, action pair (Q-Values)
     '''
-    def __init__(self):
+    def __init__(self, env):
         self.rewards_earned = []
         self.actions_taken = []
         self.transition_beliefs = None
         self.reward_beliefs = None
         self.time_taken = None
         self.converged_iteration = -1
+        self.initialize_beliefs(env)
 
-    # Update the transition model
+    def initialize_beliefs(self, env):
+        self.transition_beliefs = {}
+        self.reward_beliefs = {}
+        for curr_state in env.generate_all_states():
+            self.transition_beliefs[curr_state] = {}
+            self.reward_beliefs[curr_state] = {}
+            for action_type in env.possible_actions(curr_state):
+                self.transition_beliefs[curr_state][action_type] = {}
+                self.reward_beliefs[curr_state][action_type] = {}
+                for next_state in env.generate_all_states():
+                    self.transition_beliefs[curr_state][action_type][next_state] = [0, 0]
+                    self.reward_beliefs[curr_state][action_type][next_state] = []
+
+    # Update the transition model, assuming arguments passed as tuples
     def update_transitions(self, state, action, next_state):
-        pass
+        self.transition_beliefs[state][action][next_state][0] += 1
 
-    # Update the reward model
+        for potential_next_state in self.transition_beliefs[state][action].keys():
+            self.transition_beliefs[state][action][potential_next_state][1] += 1
+
+    # Update the reward model, assuming arguments passed as tuples
     def update_reward_beliefs(self, state, action, next_state, reward):
-        pass
+        self.reward_beliefs[state][action][next_state].append(reward)
 
     # After taking an action, updating the agent's beliefs about the environment
     def update(self, state, action, next_state, reward):

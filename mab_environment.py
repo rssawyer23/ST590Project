@@ -11,6 +11,12 @@ class MultiArmedBanditEnvironment(e.Environment):
         self.action_definition = {"1": range(k_arms)}
         self.reward_model = np.random.beta(hyper_a, hyper_b, k_arms)
 
+    def generate_all_states(self):
+        return [1]
+
+    def possible_actions(self, state):
+        return range(self.arms)
+
     def get_reward(self, state, action, next_state):
         reward = np.random.binomial(n=1, p=self.reward_model[action], size=None)
         return reward

@@ -6,8 +6,8 @@ class MabBayesianAgent(a.Agent):
     # Each arm (action) has a reward belief that is its probability of giving reward 1
     # Each of these arms is modeled by a Beta-Binomial Posterior distribution
     # The Beta prior is specified by the arguments to the initialization here
-    def __init__(self, k_arms, prior_a, prior_b):
-        a.Agent.__init__(self)
+    def __init__(self, env, k_arms, prior_a, prior_b):
+        a.Agent.__init__(self, env)
         self.reward_beliefs = dict()
         self.arms = k_arms
         self.exploring = True

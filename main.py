@@ -37,11 +37,11 @@ show = True
 
 env = mabe.MultiArmedBanditEnvironment(k_arms=k_arms, hyper_a=0.2, hyper_b=0.7)
 best_arm = np.argmax(env.reward_model)
-eps_10 = epsag.EpsGreedyAgent(k_arms=k_arms, epsilon_decay=10, decay=True)
-eps_20 = epsag.EpsGreedyAgent(k_arms=k_arms, epsilon_decay=20, decay=True)
-eps_50 = epsag.EpsGreedyAgent(k_arms=k_arms, epsilon_decay=50, decay=True)
-eps_no_decay = epsag.EpsGreedyAgent(k_arms=k_arms, epsilon_decay=0.05, decay=False)
-bay = mba.MabBayesianAgent(k_arms=k_arms, prior_a=0.5, prior_b=0.5)
+eps_10 = epsag.EpsGreedyAgent(env, k_arms=k_arms, epsilon_decay=10, decay=True)
+eps_20 = epsag.EpsGreedyAgent(env, k_arms=k_arms, epsilon_decay=20, decay=True)
+eps_50 = epsag.EpsGreedyAgent(env, k_arms=k_arms, epsilon_decay=50, decay=True)
+eps_no_decay = epsag.EpsGreedyAgent(env, k_arms=k_arms, epsilon_decay=0.05, decay=False)
+bay = mba.MabBayesianAgent(env, k_arms=k_arms, prior_a=0.5, prior_b=0.5)
 env.environment_diagnostics()
 
 agents = [eps_10, eps_20, eps_50, eps_no_decay, bay]
