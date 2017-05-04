@@ -55,7 +55,7 @@ class BlackjackEnvironment(e.Environment):
     def stay_vs_dealer(self, state):  # Agent performed "stay" or reached 21, dealer will play to 17+
         dealer_value = state[2]
         usable_ace = dealer_value == 11
-        while dealer_value < 17 and not usable_ace and state[0] > dealer_value:
+        while dealer_value < 17:
             dealer_card = self.draw_card()
             if dealer_card == 1 and not usable_ace:
                 dealer_card = 11

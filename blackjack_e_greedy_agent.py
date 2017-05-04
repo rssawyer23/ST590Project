@@ -9,7 +9,7 @@ class BlackjackEGreedyAgent(a.Agent):
         self.final_epsilon = -1.
         self.exploring = True
         self.episodes = 0
-        self.hands_won = 0
+        self.hands_won = []
         self.gamma = gamma
 
     def determine_action(self, state, possible_actions):
@@ -26,18 +26,9 @@ class BlackjackEGreedyAgent(a.Agent):
         self.actions_taken.append(action_taken)
         return action_taken
 
-    def calculate_action_value(self, state, action):
-        action_value = 0
-        for next_state in self.transition_beliefs[state][action].keys():
-            if self.transition_beliefs[state][action][next_state][0] > 0:
-                next_state_probability = self.transition_beliefs[state][action][next_state][0] / \
-                                         self.transition_beliefs[state][action][next_state][1]
-                next_state_reward = np.mean(self.reward_beliefs[state][action][next_state])
-                action_value += next_state_probability * next_state_reward
-        return action_value
-
-    def max_action_value(self, state, possible_actions):
-        best_action_value = 0
+    def greedy_action(self, state, possible_actions):
+        best_action = -1
+        best_action_value = -10
         for action in possible_actions:
             action_value = 0
             for next_state in self.transition_beliefs[state][action].keys():
@@ -48,17 +39,9 @@ class BlackjackEGreedyAgent(a.Agent):
                     action_value += next_state_probability * next_state_reward
             if action_value > best_action_value:
                 best_action_value = action_value
-        return best_action_value
-
-    def greedy_action(self, state, possible_actions):
-        best_action = -1
-        best_action_value = -10
-        for action in possible_actions:
-            for next_state in self.transition_beliefs[state][action].keys():
-                action_value = self.calculate_action_value(state, action) + self.gamma * self.max_action_value(next_state, possible_actions)
-            if action_value > best_action_value:
                 best_action = action
-                best_action_value = action_value
+        if best_action_value == -10:
+            best_action = np.random.randint(2)
         return best_action
 
     def get_epsilon(self):
@@ -66,6 +49,13 @@ class BlackjackEGreedyAgent(a.Agent):
             return float(self.decay)/(self.episodes + float(self.decay))
         else:
             return self.decay
+
+    def print_diagnostics(self, best_action):
+        print(self.to_string())
+        print("Hands Played:%d" % self.episodes)
+        print("Percent Hands Won:%.4f" % np.mean(self.hands_won))
+        print("Time Taken:%.4f" % self.time_taken)
+        print("Percent Hit:%.4f" % np.mean(self.actions_taken))
 
     def to_string(self):
         if self.should_decay:
