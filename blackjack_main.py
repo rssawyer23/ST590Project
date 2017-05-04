@@ -1,6 +1,7 @@
 import blackjack_environment as bje
 import blackjack_e_greedy_agent as bjega
 import blackjack_optimal_agent as bjoa
+import blackjack_bayesian_agent as bjba
 import numpy as np
 import datetime
 import value_iteration as vi
@@ -41,12 +42,15 @@ def run_blackjack_agent(agent, env, hands_to_play=10000):
 
 
 env = bje.BlackjackEnvironment()
-hands = 10000
+hands = 100000
 agent_egreedy = bjega.BlackjackEGreedyAgent(env)
+agent_egreedy_100 = bjega.BlackjackEGreedyAgent(env, epsilon_decay=100, decay=True)
 agent_random = bjega.BlackjackEGreedyAgent(env, epsilon_decay=1, decay=False)
+agent_bayesian = bjba.BayesianBlackjackAgent(env)
 agent_optimal = bjoa.OptimalBlackjackAgent(env)
 
-agents = [agent_egreedy, agent_random, agent_optimal]
+
+agents = [agent_bayesian, agent_egreedy, agent_egreedy_100, agent_random, agent_optimal]
 for agent in agents:
     run_blackjack_agent(agent=agent, env=env, hands_to_play=hands)
     agent.print_diagnostics(0)
