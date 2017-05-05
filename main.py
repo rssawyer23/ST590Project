@@ -30,12 +30,13 @@ def run_mab_agent(agent, env, time_steps=10):
 
 
 k_arms = 10
-time_steps = 1000
+time_steps = 10000
 state = 1  # could use random selection here
 tot_reward = 0
 show = True
 
 env = mabe.MultiArmedBanditEnvironment(k_arms=k_arms, hyper_a=0.2, hyper_b=0.7)
+env.set_reward_model([0.5,0.475,0.45,0.425,0.4,0.4,0.3,0.2,0.1,0.01])
 best_arm = np.argmax(env.reward_model)
 eps_10 = epsag.EpsGreedyAgent(env, k_arms=k_arms, epsilon_decay=10, decay=True)
 eps_20 = epsag.EpsGreedyAgent(env, k_arms=k_arms, epsilon_decay=20, decay=True)
@@ -45,11 +46,13 @@ bay = mba.MabBayesianAgent(env, k_arms=k_arms, prior_a=0.5, prior_b=0.5)
 env.environment_diagnostics()
 
 agents = [eps_10, eps_20, eps_50, eps_no_decay, bay]
-for agent in agents:
+for agent, color in zip(agents, ['b','g','r','c','m']):
     run_mab_agent(agent=agent, env=env, time_steps=time_steps)
     agent.print_diagnostics(best_arm)
     if show:
-        plt.plot(np.cumsum(agent.rewards_earned), label=agent.to_string())
+        plt.plot(np.cumsum(agent.rewards_earned), label=agent.to_string(), color=color)
+        if agent.converged_iteration > 0:
+            plt.axvline(x=agent.converged_iteration, linestyle='dashed', color=color)
 
 if show:
     plt.xlabel("Iteration")

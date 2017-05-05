@@ -27,8 +27,11 @@ class BayesianBlackjackAgent(a.Agent):
             # use sampled transition probabilities to determine action with max expected value
             for next_state, next_state_prob in zip(self.transition_beliefs[state][action].keys(), sampled_probabilities):
                 if next_state_prob > 0:
-                    next_state_reward = np.mean(self.reward_beliefs[state][action][next_state])
-                    action_value += next_state_prob * next_state_reward
+                    reward_alpha = np.sum(np.array(self.reward_beliefs[state][action][next_state]) == 1)
+                    reward_beta = np.sum(np.array(self.reward_beliefs[state][action][next_state]) == 0)
+                    if reward_alpha > 0 and reward_beta > 0:
+                        next_state_reward = np.random.beta(reward_alpha, reward_beta)
+                        action_value += next_state_prob * next_state_reward
             if action_value > best_action_value:
                 best_action_value = action_value
                 best_action = action

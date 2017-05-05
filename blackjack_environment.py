@@ -66,7 +66,7 @@ class BlackjackEnvironment(e.Environment):
         if dealer_value > 21:  # Dealer Bust
             return 1
         elif dealer_value >= state[0]:  # Ties also go to dealer
-            return -1
+            return 0
         else:  # Agent value higher than dealer value
             return 1
 
@@ -92,7 +92,7 @@ class BlackjackEnvironment(e.Environment):
 
     def get_reward(self, state, action, next_state): # will return reward and boolean determining if continue allowed
         if next_state[0] > 21:
-            return -1
+            return 0
         elif next_state[3]:  # Blackjack Agent stays or is forced to stay by reaching 21
             return self.stay_vs_dealer(next_state)  # Evaluate dealer hand, give reward, end round
         else:

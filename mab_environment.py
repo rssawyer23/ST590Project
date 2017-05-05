@@ -11,6 +11,11 @@ class MultiArmedBanditEnvironment(e.Environment):
         self.action_definition = {"1": range(k_arms)}
         self.reward_model = np.random.beta(hyper_a, hyper_b, k_arms)
 
+    def set_reward_model(self, reward_list):
+        self.reward_model = np.array(reward_list)
+        self.arms = len(reward_list)
+        self.action_definition = {"1":range(self.arms)}
+
     def generate_all_states(self):
         return [1]
 

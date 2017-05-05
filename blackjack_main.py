@@ -23,14 +23,17 @@ def run_blackjack_agent(agent, env, hands_to_play=10000):
             print("Hand Number:%d" % i)
         prev_state = env.initial_state()
         reward = None
+        episode_transitions = []
         while not prev_state[3]:  # Boolean for terminal state
             if show:
                 print(prev_state)
             action = agent.determine_action(tuple(prev_state), env.possible_actions(prev_state))  # To be replaced by agent decision
             next_state = env.determine_next_state(prev_state, action)
             reward = env.get_reward(prev_state, action, next_state)
-            agent.update(tuple(prev_state), action, tuple(next_state), reward)  # Update agent with prev_state, action, next_state, reward tuple
+            episode_transitions.append([tuple(prev_state), action, tuple(next_state)])
             prev_state = next_state
+        for transition in episode_transitions:
+            agent.update(transition[0], transition[1], transition[2], reward)
         if show:
             print(next_state)
         agent.episodes += 1
@@ -38,6 +41,7 @@ def run_blackjack_agent(agent, env, hands_to_play=10000):
     finish_time = datetime.datetime.now()
     agent.time_taken = (finish_time - start_time).total_seconds()
     values, policy = vi.value_iteration(env.generate_all_states(), agent.transition_beliefs, agent.reward_beliefs)
+    pa.basic_output(values, policy)
     pa.policy_visualization(values, policy)
 
 
